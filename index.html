@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Aviation CL">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iNDAiIGZpbGw9IiMxZTQwYWYiLz4KPHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgeD0iMzAiIHk9IjMwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiI+CjxwYXRoIGQ9Im05IDExIDMgM0wyMiA0Ii/+CjxwYXRoIGQ9Im0yMSA0LTcgN0g4bC03LTMiLz4KPHA+b2ludCBkPSJtOSAxMVY5YTMgMyAwIDAgMSA2IDBWMiIvPgo8L3N2Zz4KPC9zdmc+">
+    <link rel="manifest" href="manifest.json">
+    <title>Aviation Checklist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .btn.primary {
+            background: rgba(34,197,94,0.8);
+            border-color: rgba(34,197,94,1);
+        }
+        
+        .btn.primary:hover {
+            background: rgba(34,197,94,0.9);
+        }
+        
+        .checklist-selector {
+            margin-bottom: 20px;
+        }
+        
+        .checklist-selector select {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1.1rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .checklist-selector select option {
+            background: #1e3c72;
+            color: white;
+        }
+        
+        .checklist-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        .checklist-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #fbbf24;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .checklist-item.current {
+            background: rgba(34,197,94,0.15);
+            border-left-color: #22c55e;
+            box-shadow: 0 4px 15px rgba(34,197,94,0.2);
+            transform: scale(1.02);
+        }
+        
+        .checklist-item.completed {
+            background: rgba(16,185,129,0.1);
+            border-left-color: #10b981;
+            opacity: 0.7;
+        }
+        
+        .checklist-item.pending {
+            opacity: 0.5;
+        }
+        
+        .checkbox {
+            width: 25px;
+            height: 25px;
+            border: 3px solid rgba(255,255,255,0.6);
+            border-radius: 6px;
+            margin-right: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .checkbox.checked {
+            background: #22c55e;
+            border-color: #22c55e;
+        }
+        
+        .checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .item-text {
+            flex: 1;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+        
+        .new-checklist-form {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #fbbf24;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-group input::placeholder, .form-group textarea::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .status-complete {
+            text-align: center;
+            padding: 30px;
+            background: rgba(34,197,94,0.15);
+            border-radius: 20px;
+            border: 2px solid rgba(34,197,94,0.3);
+            margin-top: 20px;
+        }
+        
+        .status-complete h2 {
+            color: #22c55e;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>✈️ Aviation Checklist</h1>
+            <p>Checklists professionnelles pour l'aviation</p>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="toggleNewChecklistForm()">Nouvelle Checklist</button>
+            <button class="btn" onclick="resetCurrentChecklist()">Reset Actuelle</button>
+            <button class="btn primary" onclick="exportChecklists()">Exporter</button>
+        </div>
+        
+        <div id="newChecklistForm" class="new-checklist-form">
+            <h3 style="margin-bottom: 20px; color: #fbbf24;">Créer une nouvelle checklist</h3>
+            <div class="form-group">
+                <label>Nom de la checklist:</label>
+                <input type="text" id="checklistName" placeholder="Ex: Pré-vol, Décollage, Atterrissage...">
+            </div>
+            <div class="form-group">
+                <label>Items (un par ligne):</label>
+                <textarea id="checklistItems" rows="8" placeholder="Ex:&#10;Carburant - VÉRIFIÉ&#10;Contrôles moteur - EFFECTUÉS&#10;Radio - TESTÉE&#10;Transpondeur - RÉGLÉ"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn primary" onclick="createChecklist()">Créer</button>
+                <button class="btn" onclick="toggleNewChecklistForm()">Annuler</button>
+            </div>
+        </div>
+        
+        <div class="checklist-selector">
+            <select id="checklistSelect" onchange="loadChecklist()">
+                <option value="">Sélectionner une checklist...</option>
+            </select>
+        </div>
+        
+        <div id="checklistContainer" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="checklist-container">
+                <h2 class="checklist-title" id="checklistTitle"></h2>
+                <div id="checklistItemsDisplay"></div>
+            </div>
+        </div>
+        
+        <div id="completeStatus" class="status-complete" style="display: none;">
+            <h2>✅ Checklist Terminée!</h2>
+            <p>Tous les items ont été vérifiés avec succès.</p>
+        </div>
+    </div>
+
+    <script>
+        let checklists = {};
+        let currentChecklist = null;
+        let currentItems = [];
+        let currentIndex = 0;
+
+        // Checklists par défaut
+        const defaultChecklists = {
+            "Pre-vol": [
+                "Documents avion - VÉRIFIÉS",
+                "Carburant - QUANTITÉ VÉRIFIÉE",
+                "Huile moteur - NIVEAU OK",
+                "Contrôle visuel extérieur - EFFECTUÉ",
+                "Hélice - VÉRIFIÉE",
+                "Train d'atterrissage - VÉRIFIÉ",
+                "Surfaces de contrôle - LIBRES"
+            ],
+            "Avant démarrage": [
+                "Parking brake - SERRÉ",
+                "Circuit électrique - ON",
+                "Carburant - POMPE ON",
+                "Mélange - RICHE",
+                "Hélice - HAUTE",
+                "Commandes - VÉRIFIÉES"
+            ],
+            "Après atterrissage": [
+                "Volets - RENTRÉS",
+                "Transpondeur - STANDBY",
+                "Feux - TAXI UNIQUEMENT",
+                "Radio - TOUR/SOL",
+                "Mixture - APPAUVRISSEMENT",
+                "Débriefing - EFFECTUÉ"
+            ]
+        };
+
+        // Initialisation
+        function init() {
+            loadFromStorage();
+            if (Object.keys(checklists).length === 0) {
+                checklists = {...defaultChecklists};
+                saveToStorage();
+            }
+            updateChecklistSelector();
+        }
+
+        function loadFromStorage() {
+            const stored = localStorage.getItem('aviationChecklists');
+            if (stored) {
+                checklists = JSON.parse(stored);
+            }
+        }
+
+        function saveToStorage() {
+            try {
+                localStorage.setItem('aviationChecklists', JSON.stringify(checklists));
+            } catch(e) {
+                console.log('Storage not available, using session storage');
+            }
+        }
+
+        function updateChecklistSelector() {
+            const select = document.getElementById('checklistSelect');
+            select.innerHTML = '<option value="">Sélectionner une checklist...</option>';
+            
+            Object.keys(checklists).forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                select.appendChild(option);
+            });
+        }
+
+        function loadChecklist() {
+            const selectedName = document.getElementById('checklistSelect').value;
+            if (!selectedName) {
+                document.getElementById('checklistContainer').style.display = 'none';
+                document.getElementById('completeStatus').style.display = 'none';
+                return;
+            }
+
+            currentChecklist = selectedName;
+            currentItems = checklists[selectedName].map(item => ({
+                text: item,
+                completed: false
+            }));
+            currentIndex = 0;
+
+            displayChecklist();
+        }
+
+        function displayChecklist() {
+            document.getElementById('checklistContainer').style.display = 'block';
+            document.getElementById('completeStatus').style.display = 'none';
+            document.getElementById('checklistTitle').textContent = currentChecklist;
+
+            const container = document.getElementById('checklistItemsDisplay');
+            container.innerHTML = '';
+
+            currentItems.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'checklist-item';
+                
+                if (index < currentIndex) {
+                    itemElement.classList.add('completed');
+                } else if (index === currentIndex) {
+                    itemElement.classList.add('current');
+                } else {
+                    itemElement.classList.add('pending');
+                }
+
+                itemElement.innerHTML = `
+                    <div class="checkbox ${item.completed ? 'checked' : ''}"></div>
+                    <div class="item-text">${item.text}</div>
+                `;
+
+                itemElement.onclick = () => checkItem(index);
+                container.appendChild(itemElement);
+            });
+
+            updateProgress();
+        }
+
+        function checkItem(index) {
+            if (index !== currentIndex) return;
+
+            currentItems[index].completed = true;
+            currentIndex++;
+
+            // Auto-scroll vers le prochain item
+            setTimeout(() => {
+                if (currentIndex < currentItems.length) {
+                    displayChecklist();
+                    // Scroll vers l'item actuel
+                    const currentItem = document.querySelector('.checklist-item.current');
+                    if (currentItem) {
+                        currentItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } else {
+                    // Checklist terminée
+                    document.getElementById('checklistContainer').style.display = 'none';
+                    document.getElementById('completeStatus').style.display = 'block';
+                }
+            }, 300);
+        }
+
+        function updateProgress() {
+            const progress = (currentIndex / currentItems.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function resetCurrentChecklist() {
+            if (!currentChecklist) return;
+            
+            currentItems.forEach(item => item.completed = false);
+            currentIndex = 0;
+            displayChecklist();
+        }
+
+        function toggleNewChecklistForm() {
+            const form = document.getElementById('newChecklistForm');
+            const isVisible = form.style.display !== 'none';
+            form.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                document.getElementById('checklistName').focus();
+            }
+        }
+
+        function createChecklist() {
+            const name = document.getElementById('checklistName').value.trim();
+            const itemsText = document.getElementById('checklistItems').value.trim();
+
+            if (!name || !itemsText) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+
+            const items = itemsText.split('\n').filter(item => item.trim());
+            checklists[name] = items;
+            
+            saveToStorage();
+            updateChecklistSelector();
+            
+            document.getElementById('checklistName').value = '';
+            document.getElementById('checklistItems').value = '';
+            toggleNewChecklistForm();
+            
+            // Auto-sélectionner la nouvelle checklist
+            document.getElementById('checklistSelect').value = name;
+            loadChecklist();
+        }
+
+        function exportChecklists() {
+            const dataStr = JSON.stringify(checklists, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'aviation-checklists.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialisation au chargement
+        init();
+    </script>
+</body>
+</html>
