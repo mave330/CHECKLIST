@@ -3,7 +3,7 @@
 Une webapp de checklists professionnelles pour l'aviation, optimisée pour mobile et utilisable hors-ligne.
 
 ## 🚀 Accès direct
-**[Utiliser l'application →](https://votrenom.github.io/aviation-checklist/)**
+**[Utiliser l'application →](https://github.com/mave330/CHECKLIST/)**
 
 ## 📱 Installation sur mobile
 1. Ouvrez le lien ci-dessus dans Safari (iOS) ou Chrome (Android)
